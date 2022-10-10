@@ -1,0 +1,150 @@
+
+#GROUP 6: Dalia BOUDJEMIA, Guillaume CAMPAN, Annaëlle GUEZ, Mohamed-Amine
+#OECD HOUSING PRICE INDEX
+
+library(shiny)
+library(shinythemes)
+library(ggplot2)
+library(data.table)
+HP <- readr::read_csv("https://github.com/cGuillaumec/ProjectRstudioGroup6/blob/21c0e3497a335e756cbfc6ccf10a15e978f858ab/DP_LIVE_03102022234015026.csv")
+data(HP)
+
+# Define UI for application that draws a histogram
+#Choice of the theme
+ui <- fluidPage(theme = shinytheme("united"),
+                
+                navbarPage(
+                  # Application title
+                  "OECD Housing Data",
+                  
+                  # Line Plot construction:
+                  # Name of the tab panel:
+                  tabPanel("Price Evolution",
+                           # Sidebar with a selectize input for subject, time and location:
+             
+                           sidebarPanel(
+                             # inputs go here
+                             h2("Filters:"),
+                             selectizeInput("Subject_input", "Select subject:",
+                                            choices = unique(HP$SUBJECT),
+                                            selected="NOMINAL", multiple =FALSE),
+                             selectizeInput("Country_input", "Select country:",
+                                            choices = unique(HP$LOCATION),
+                                            selected="FRA", multiple =TRUE),
+                              
+                           ),
+                          
+                           # Show a plot of the generated distribution
+                           h4(helpText("Group 6: Dalia BOUDJEMIA, Guillaume CAMPAN, Annaëlle GUEZ, Mohamed-Amine KNOUZI",align="center")),
+                           
+                           mainPanel(
+                             h2 ("Price Evolution by country between 1971-2022",align = "center"),
+                             plotOutput("oecd_plot"),
+                             
+                             h5("This graph allows us to compare the evolution of the price (real, rent…) of houses in different countries.",align = "center")
+                           )
+                           
+                  ),
+                  # Line Plot construction:
+                  # Adding a tab panel
+                  tabPanel("Distribution & Density",
+                           # Sidebar with a selectize input for subject, time and location:
+                           sidebarPanel(
+                             h2("Filters:"),
+                             selectizeInput("Subject_input_2", "Select subject:",
+                                            choices = unique(HP$SUBJECT),
+                                            selected="NOMINAL", multiple =FALSE),
+                             selectizeInput("Country_input_2", "select the country",
+                                            choices = unique(HP$LOCATION),
+                                            selected="FRA", multiple =TRUE),
+                           ),
+                           
+                           h4(helpText("Group 6: Dalia BOUDJEMIA, Guillaume CAMPAN, Annaëlle GUEZ, Mohamed-Amine KNOUZI",align="center")),
+                           
+                           mainPanel(
+                             h2("Distribution & Density of real estate value by Country",align = "center"),
+                             plotOutput("densityPlot"),
+                             
+                             h5("This graph allows you to observe the distribution in gray of the selected countries and to compare the density of the real estate value by country.",align = "center")
+                           )
+                  ),
+                  # Histogram construction:
+                  # Adding a tab panel
+                  tabPanel("Cumulative distribution",
+                           # Sidebar with a slider input to choose the bins:
+                           sidebarPanel(
+                             h2("Filters:"),
+                             selectizeInput("Subject_input_3", "Select subject:",
+                                            choices = unique(HP$SUBJECT),
+                                            selected="NOMINAL", multiple =FALSE),
+                             sliderInput("bins",
+                                         "Number of bins:",
+                                         min = 0,
+                                         max = 50,
+                                         value = 15),
+                             
+                             selectizeInput("Country_input_3", "select the country",
+                                            choices = unique(HP$LOCATION),
+                                            selected="FRA", multiple =TRUE),
+                           ),
+                           
+                           # Show a plot of the generated distribution
+                           h4(helpText("Group 6: Dalia BOUDJEMIA, Guillaume CAMPAN, Annaëlle GUEZ, Mohamed-Amine KNOUZI",align="center")),
+                           
+                           mainPanel(
+                             h2("Cumulative distribution of property Value by Country",align = "center"),
+                             plotOutput("distPlot"),
+                             
+                             h5("This graph allows you to observe the distribution of the value of houses for the selected countries.",align = "center")
+                           )
+                  )
+                )
+)
+# Define server logic required to draw the plots
+server <- function(input, output) {
+  
+  #In order to translate the user’s input into the displayed graph, first we need to create a reactive dataset within the app. We will continue to add conditions to this dataset as we add more user inputs. For our first input, we add a filtering condition that will filter the disease data based on the user’s input. To call a user’s input, we use the syntax input$inputname, so in this case input$stateInput to select whatever state the user selected.
+  filtered <- reactive({HP[SUBJECT==input$Subject_input & INDICATOR=="HOUSECOST" & LOCATION %in% input$Country_input] #
+  })
+  filtered_density<-reactive({HP[SUBJECT==input$Subject_input_2 & INDICATOR=="HOUSECOST" & LOCATION %in% input$Country_input_2]
+  })
+  filtered_hist<-reactive({HP[SUBJECT==input$Subject_input_3 & INDICATOR=="HOUSECOST" & LOCATION %in% input$Country_input_3]
+  })
+  
+  #LINE PLOT:
+  output$oecd_plot <- renderPlot({
+    ggplot(filtered(), aes(x=TIME, y = Value, group=LOCATION ) ) +
+      geom_line(colour = "grey") +
+      geom_line(data = filtered(),
+                aes(x=TIME, y = Value, col = LOCATION ),
+                size =2) +
+      scale_y_log10(limits = c(50,200)) +
+      scale_x_date(limits = as.Date(c("2001-01-01","2021-01-01")))+xlab("Time")+ylab("Value")
+    
+  })
+  # DENSITY PLOT:
+  output$densityPlot <- renderPlot({
+    # generate bins based on input$bins from ui.R
+    # draw the histogram with the specified number of bins
+    ggplot(filtered_density(), aes(x=Value,color=LOCATION,fill=LOCATION) ) +
+      geom_histogram(binwidth=15,color="black",fill='grey',aes(y=..density..))+
+      geom_density(alpha=0.3)
+  })
+  
+  #HISTOGRAM:
+  output$distPlot <- renderPlot({
+    
+    # generate bins based on input$disPlot from ui.R
+    x    <- HP$Value
+    bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    
+    # draw the histogram with the specified number of bins
+    ggplot(filtered_hist(), aes(x=Value,color=LOCATION) ) +
+      geom_histogram(binwidth=input$bins,color="black",fill='#009999')
+  })
+  
+}
+
+# Run the application
+
+shinyApp(ui = ui, server = server)
