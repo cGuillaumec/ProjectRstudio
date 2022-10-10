@@ -6,7 +6,7 @@ library(shiny)
 library(shinythemes)
 library(ggplot2)
 library(data.table)
-HP <- readr::read_csv("C:/Users/guill/Desktop/Projet R/DP_LIVE_03102022234015026.csv")
+HP <- readr::read_csv("https://github.com/cGuillaumec/ProjectRstudioGroup6/blob/21c0e3497a335e756cbfc6ccf10a15e978f858ab/DP_LIVE_03102022234015026.csv")
 data(HP)
 
 # Define UI for application that draws a histogram
