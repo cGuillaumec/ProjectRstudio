@@ -1,7 +1,7 @@
 
 #GROUP 6: Dalia BOUDJEMIA, Guillaume CAMPAN, Annaëlle GUEZ, Mohamed-Amine
 
-HP <- readr::read_csv("https://github.com/cGuillaumec/ProjectRstudioGroup6/blob/21c0e3497a335e756cbfc6ccf10a15e978f858ab/DP_LIVE_03102022234015026.csv")
+HP <- readr::read_csv("https://github.com/cGuillaumec/ProjectRstudioGroup6/blob/f0504d50fe7c7ffadbdf132e52fd3aeaab4bd23c/DP_LIVE_03102022234015026.csv")
 library(data.table)
 nrow(HP)
 setDT(HP)   
