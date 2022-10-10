@@ -1,12 +1,26 @@
 
 #GROUP 6: Dalia BOUDJEMIA, Guillaume CAMPAN, Annaëlle GUEZ, Mohamed-Amine
-#OECD HOUSING PRICE INDEX
+
+HP <- readr::read_csv("https://github.com/cGuillaumec/ProjectRstudioGroup6/blob/21c0e3497a335e756cbfc6ccf10a15e978f858ab/DP_LIVE_03102022234015026.csv")
+library(data.table)
+nrow(HP)
+setDT(HP)   
+str(HP)
+unique(HP$LOCATION)
+unique(HP$INDICATOR)
+unique(HP$FREQUENCY)
+HP = HP[FREQUENCY == "Q"]
+#head(HP$TIME)
+#head(gsub("Q1","01-01",HP$TIME))
+HP$TIME = gsub("Q1","01-01",HP$TIME)
+str(HP)
+HP$TIME <- as.Date(HP$TIME)
+class(HP$TIME)
 
 library(shiny)
 library(shinythemes)
 library(ggplot2)
 library(data.table)
-HP <- readr::read_csv("https://github.com/cGuillaumec/ProjectRstudioGroup6/blob/21c0e3497a335e756cbfc6ccf10a15e978f858ab/DP_LIVE_03102022234015026.csv")
 data(HP)
 
 # Define UI for application that draws a histogram
@@ -21,7 +35,7 @@ ui <- fluidPage(theme = shinytheme("united"),
                   # Name of the tab panel:
                   tabPanel("Price Evolution",
                            # Sidebar with a selectize input for subject, time and location:
-             
+                           
                            sidebarPanel(
                              # inputs go here
                              h2("Filters:"),
@@ -31,9 +45,9 @@ ui <- fluidPage(theme = shinytheme("united"),
                              selectizeInput("Country_input", "Select country:",
                                             choices = unique(HP$LOCATION),
                                             selected="FRA", multiple =TRUE),
-                              
+                             
                            ),
-                          
+                           
                            # Show a plot of the generated distribution
                            h4(helpText("Group 6: Dalia BOUDJEMIA, Guillaume CAMPAN, Annaëlle GUEZ, Mohamed-Amine KNOUZI",align="center")),
                            
@@ -103,7 +117,7 @@ ui <- fluidPage(theme = shinytheme("united"),
 # Define server logic required to draw the plots
 server <- function(input, output) {
   
-  #In order to translate the user’s input into the displayed graph, first we need to create a reactive dataset within the app. We will continue to add conditions to this dataset as we add more user inputs. For our first input, we add a filtering condition that will filter the disease data based on the user’s input. To call a user’s input, we use the syntax input$inputname, so in this case input$stateInput to select whatever state the user selected.
+  #In order to translate the user’s input into the displayed graph, first we need to create a reactive dataset within the app.  For our first input, we add a filtering condition that will filter  data based on the user’s input.
   filtered <- reactive({HP[SUBJECT==input$Subject_input & INDICATOR=="HOUSECOST" & LOCATION %in% input$Country_input] #
   })
   filtered_density<-reactive({HP[SUBJECT==input$Subject_input_2 & INDICATOR=="HOUSECOST" & LOCATION %in% input$Country_input_2]
