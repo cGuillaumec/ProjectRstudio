@@ -8,8 +8,6 @@ setDT(HP)
 str(HP)
 unique(HP$LOCATION)
 unique(HP$INDICATOR)
-unique(HP$FREQUENCY)
-HP = HP[FREQUENCY == "Q"]
 #head(HP$TIME)
 #head(gsub("Q1","01-01",HP$TIME))
 HP$TIME = gsub("Q1","01-01",HP$TIME)
