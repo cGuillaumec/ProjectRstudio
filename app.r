@@ -1,8 +1,8 @@
 
 #GROUP 6: Dalia BOUDJEMIA, Guillaume CAMPAN, Annaëlle GUEZ, Mohamed-Amine
 library(RCurl)
-x <- getURL("https://github.com/cGuillaumec/ProjectRstudioGroup6/blob/21c0e3497a335e756cbfc6ccf10a15e978f858ab/DP_LIVE_03102022234015026.csv")
-HP <- read.csv(text = x)
+HP <- read.csv(getURL("https://github.com/cGuillaumec/ProjectRstudioGroup6/blob/21c0e3497a335e756cbfc6ccf10a15e978f858ab/DP_LIVE_03102022234015026.csv"))
+
 
 library(data.table)
 nrow(HP)
